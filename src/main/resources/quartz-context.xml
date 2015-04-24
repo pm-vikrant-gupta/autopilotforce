@@ -37,7 +37,7 @@
 	<!-- Run the job every 5 seconds only on weekends -->
 	<bean id="cronTrigger"  class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="complexJobDetail" />
-		<property name="cronExpression" value="0 32 17 24 4 ?" />
+		<property name="cronExpression" value="0 * * * * ?" />
 	</bean>
 
 
