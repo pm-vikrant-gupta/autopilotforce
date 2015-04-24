@@ -1,14 +1,12 @@
 package com.websystique.spring.quartz;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Properties;
 
-import javax.mail.Folder;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.NoSuchProviderException;
-import javax.mail.Session;
-import javax.mail.Store;
+import javax.mail.*;
 
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -26,69 +24,134 @@ public class TestMailJob extends QuartzJobBean {
 			throws JobExecutionException {
 		// TODO Auto-generated method stub
 
+        String host = "pop.gmail.com";// change accordingly
+        String mailStoreType = "pop3";
+        String username = "auto.pilot.pm@gmail.com";// change accordingly
+        String password = "K!llB!ll";// change accordingly
+
+
+		/*sendMail();
 		sendMail();
-		sendMail();
-		sendMail();
-		checkMail();
+		sendMail();*/
+        fetch( host,  mailStoreType,  username, password);
 
-	}
+    }
 
-	private void checkMail() {
-		String host = "pop.gmail.com";// change accordingly
-	      String mailStoreType = "pop3";
-	      String username = "auto.pilot.pm@gmail.com";// change accordingly
-	      String password = "K!llB!ll";// change accordingly
-	      
-		try {
-			//create properties field
-			  Properties properties = new Properties();
+    public  void fetch(String pop3Host, String storeType, String user,
+                             String password) {
+        try {
+            // create properties field
+            Properties properties = new Properties();
+            properties.put("mail.store.protocol", "pop3");
+            properties.put("mail.pop3.host", pop3Host);
+            properties.put("mail.pop3.port", "995");
+            properties.put("mail.pop3.starttls.enable", "true");
+            Session emailSession = Session.getDefaultInstance(properties);
+            // emailSession.setDebug(true);
 
-			  properties.put("mail.pop3.host", host);
-			  properties.put("mail.pop3.port", "995");
-			  properties.put("mail.pop3.starttls.enable", "true");
-			  
-			  Session emailSession = Session.getDefaultInstance(properties);
-			  
-			//create the POP3 store object and connect with the pop server
-			  Store store = emailSession.getStore("pop3s");
+            // create the POP3 store object and connect with the pop server
+            Store store = emailSession.getStore("pop3s");
 
-			  store.connect(host, username, password);
+            store.connect(pop3Host, user, password);
 
-			  //create the folder object and open it
-			  Folder emailFolder = store.getFolder("INBOX");
-			  emailFolder.open(Folder.READ_ONLY);
+            // create the folder object and open it
+            Folder emailFolder = store.getFolder("INBOX");
+            emailFolder.open(Folder.READ_ONLY);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+            // retrieve the messages from the folder in an array and print it
+            Message[] messages = emailFolder.getMessages();
+            System.out.println("messages.length---" + messages.length);
+            boolean isAttachmentPresent = false;
+            for (int i = 0; i < messages.length; i++) {
+                Message message = messages[i];
+                System.out.println("---------------------------------");
+                writePart(message,isAttachmentPresent);
+            }
 
-			  // retrieve the messages from the folder in an array and print it
-			  Message[] messages = emailFolder.getMessages();
-			  System.out.println("messages.length---" + messages.length);
+            if(isAttachmentPresent){
+                System.out.println("Attachment is present ...so go for operation");
+            }else{
+                System.out.println("Attachment is not present ...return template ");
+            }
 
-			  for (int i = 0, n = messages.length; i < n; i++) {
-			     Message message = messages[i];
-			     System.out.println("---------------------------------");
-			     System.out.println("Email Number " + (i + 1));
-			     System.out.println("Subject: " + message.getSubject());
-			     System.out.println("From: " + message.getFrom()[0]);
-			     System.out.println("Text: " + message.getContent().toString());
+            // close the store and folder objects
+            emailFolder.close(false);
+            store.close();
 
-			  }
+        } catch (NoSuchProviderException e) {
+            e.printStackTrace();
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
-			  //close the store and folder objects
-			  emailFolder.close(false);
-			  store.close();
-		} catch (NoSuchProviderException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (MessagingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-	}
 
-	private void sendMail() {
+    /*
+    * This method checks for content-type
+    * based on which, it processes and
+    * fetches the content of the message
+    */
+    public static void writePart(Part p,boolean isAttachmentPresent) throws Exception {
+        if (p instanceof Message)
+            //Call methos writeEnvelope
+            writeEnvelope((Message) p);
+        if (p.isMimeType("multipart/*")) {
+            System.out.println("This is a Multipart");
+            System.out.println("--------------------------- ");
+            Multipart mp = (Multipart) p.getContent();
+            int count = mp.getCount();
+            for (int i = 0; i < count; i++)
+                writePart(mp.getBodyPart(i),isAttachmentPresent);
+        }
+
+        else {
+            Object o = p.getContent();
+            if (o instanceof InputStream) {
+                if(p.isMimeType("application/vnd.ms-excel")){
+                    isAttachmentPresent = true;
+                }
+                InputStream is = (InputStream) o;
+                is = (InputStream) o;
+                int c;
+                while ((c = is.read()) != -1)
+                    System.out.write(c);
+            }
+
+        }
+
+    }
+    /*
+    * This method would print FROM,TO and SUBJECT of the message
+    */
+    public static void writeEnvelope(Message m) throws Exception {
+        System.out.println("This is the message envelope");
+        System.out.println("---------------------------");
+        Address[] a;
+
+        // FROM
+        if ((a = m.getFrom()) != null) {
+            for (int j = 0; j < a.length; j++)
+                System.out.println("FROM: " + a[j].toString());
+        }
+
+        // TO
+        if ((a = m.getRecipients(Message.RecipientType.TO)) != null) {
+            for (int j = 0; j < a.length; j++)
+                System.out.println("TO: " + a[j].toString());
+        }
+
+        // SUBJECT
+        if (m.getSubject() != null)
+            System.out.println("SUBJECT: " + m.getSubject());
+
+    }
+
+
+    private void sendMail() {
 		// TODO Auto-generated method stub
 		System.out.println("Fetching mail..");
 		Email newEmail = new Email();
