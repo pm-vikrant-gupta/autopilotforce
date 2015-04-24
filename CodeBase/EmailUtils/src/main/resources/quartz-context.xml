@@ -4,11 +4,11 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
         					http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd">
 
-	<context:component-scan base-package="com.websystique.spring" />
+	<context:component-scan base-package="com.pubmatic.hackathon" />
 
 	<!-- For times when you need more complex processing, passing data to the scheduled job -->
 	<bean name="complexJobDetail" 	class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
-		<property name="jobClass" value="com.websystique.spring.quartz.TestMailJob" />
+		<property name="jobClass" value="com.pubmatic.hackathon.quartz.TestMailJob" />
 		<property name="jobDataMap">
 			<map>
 				<entry key="emailService" value-ref="emailService" />
@@ -41,7 +41,7 @@
 		</property>
 	</bean>
 
-	 <bean id="emailService" class="com.websystique.spring.EmailService">
+	 <bean id="emailService" class="com.pubmatic.hackathon.EmailService">
 	  <property name="mailSender" ref="mailSender"></property>
 	 </bean>
 	 

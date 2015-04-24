@@ -1,18 +1,21 @@
-package com.websystique.spring.quartz;
+package com.pubmatic.hackathon.quartz;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Properties;
+
 import javax.mail.*;
+
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.scheduling.quartz.QuartzJobBean;
-import com.websystique.spring.Attachment;
-import com.websystique.spring.Email;
-import com.websystique.spring.EmailService;
+
+import com.pubmatic.hackathon.Attachment;
+import com.pubmatic.hackathon.Email;
+import com.pubmatic.hackathon.EmailService;
 
 public class TestMailJob extends QuartzJobBean {
 

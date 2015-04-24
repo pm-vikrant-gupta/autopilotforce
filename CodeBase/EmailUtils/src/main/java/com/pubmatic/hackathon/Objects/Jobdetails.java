@@ -1,4 +1,4 @@
-package com.websystique.spring.Objects;
+package com.pubmatic.hackathon.Objects;
 
 import java.io.InputStream;
 
