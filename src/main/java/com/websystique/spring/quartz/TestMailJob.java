@@ -5,13 +5,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Properties;
-
 import javax.mail.*;
-
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.scheduling.quartz.QuartzJobBean;
-
+import com.websystique.spring.Attachment;
 import com.websystique.spring.Email;
 import com.websystique.spring.EmailService;
 
@@ -154,15 +153,29 @@ public class TestMailJob extends QuartzJobBean {
     private void sendMail() {
 		// TODO Auto-generated method stub
 		System.out.println("Fetching mail..");
-		Email newEmail = new Email();
-		newEmail.setFrom("test_shalmali@gmail.com");
-		newEmail.setSubject("Test subject");
-		newEmail.setText("<h1>Dear Many Many Happy Returns of the day :-)</h1>");
-		newEmail.setTo("auto.pilot.pm@gmail.com");
-
 		try {
+			Email newEmail = new Email();
+			newEmail.setFrom("test_shalmali@gmail.com");
+			newEmail.setSubject("Test subject");
+			newEmail.setText("<h1>Dear Many Many Happy Returns of the day :-)</h1>");
+			newEmail.setTo("auto.pilot.pm@gmail.com");
+	
+			byte[] data = null;
+		    ClassPathResource img = new ClassPathResource("testOfferSheet.xls");
+		    InputStream inputStream = img.getInputStream();
+		    data = new byte[inputStream.available()];
+		    while((inputStream.read(data)!=-1));
+		   
+		    Attachment attachment = new Attachment(data, "testOfferSheet", 
+		      "application/vnd.ms-excel", false);
+		    newEmail.addAttachment(attachment);
+	    
+		
 			emailService.sendEmail(newEmail);
 		} catch (MessagingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

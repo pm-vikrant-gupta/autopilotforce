@@ -12,7 +12,7 @@ public class Email {
 	private String subject;
 	private String text;
 	private String mimeType;
-	//private List<Attachment> attachments = new ArrayList<Attachment>();
+	private List<Attachment> attachments = new ArrayList<Attachment>();
 
 	public String getFrom() {
 		return from;
@@ -70,7 +70,7 @@ public class Email {
 		this.mimeType = mimeType;
 	}
 
-	/*public List<Attachment> getAttachments() {
+	public List<Attachment> getAttachments() {
 		return attachments;
 	}
 
@@ -88,6 +88,6 @@ public class Email {
 
 	public void removeAllAttachments() {
 		this.attachments.clear();
-	}*/
+	}
 
 }
